@@ -11,7 +11,14 @@ DIHI created a trans-disciplinary team of obstetric physicians, and technical st
 
 ## **About my Role**
 
-I have authored all code in this repository, and have been responsible for all dataset building and modeling for the project, supervised by Mark Sendak and Michael Gao (DIHI). Phenotype definitions were created by the following clinical members of the MEWS team: , and the project has been managed by Will Knechtle. 
+I have authored all code in this repository, and have been responsible for all dataset building and modeling for the project, supervised by Mark Sendak and Michael Gao (DIHI). Phenotype definitions were created by the following clinical members of the MEWS team: 
+Ashraf Habib, MBBCh, MSc, FRCA, Terrence Allen, MBBS,
+Sarah McWay Boling, RN
+Melissa Bauer, DO,
+Jennifer Gilner, MD, PhD,
+Suresh Balu, MBA, MS,
+Brenna Hughes, MD, MSc, 
+Courtney Mitchell, MD, PHD, and the project has been managed by Will Knechtle. 
 
 ## **Included in this Repository**
 
