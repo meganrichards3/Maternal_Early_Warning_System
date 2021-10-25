@@ -1,4 +1,4 @@
-# Maternal_Early_Warning_System
+# Maternal Early Warning System
 **This project is supervised by the Duke Institute for Healthcare Innovation and Duke University Hospital System. The project builds a perinatal early warning system, which predicts the following eight outcomes of Severe Maternal Morbidity (SMM) using time-series data of perinatal encounters. Outcomes include Hemorrhage, Sepsis, Eclampsia, Embolism, Acute Renal Failure, Acute Respiratory Distress Syndrome, and Acute Heart Failure, and Disseminated Intravascular Coagulation.**
 
 **About the Project**
