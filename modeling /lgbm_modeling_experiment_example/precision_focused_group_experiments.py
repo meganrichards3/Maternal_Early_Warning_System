@@ -1,18 +1,10 @@
 # This code allows this file to access folders in the immediate parent directory
 import os
 import sys
-
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
-
 import lgbm_experiment_utils as lgbm_experiment_utils
-import numpy as np
-
-
-from sklearn.experimental import enable_halving_search_cv  # noqa
-np.random.seed(1)
-
 
 # ## Gap Experiment
 

@@ -10,6 +10,11 @@ import re
 
 
 def write_experiments(experiments_file_path, row_to_add):
+    """
+    :param experiments_file_path: File path to csv with experiment documentation
+    :param row_to_add: dictionary of values to add to the CSV
+    :return: none
+    """
     with open(experiments_file_path, 'a') as f:
         writer = csv.writer(f)
         writer.writerow(row_to_add.values())
@@ -31,6 +36,29 @@ def train(train_set,
           values_tested,
           description="",
           commentary=""):
+    """
+    :param train_set: DataFrame of training set
+    :param test_set: DataFrame of test set
+    :param label_col: Column string used for label
+    :param encounter_col: Column string used for identifying an encounter
+    :param patient_col: Column string used for identifying a patient
+    :param hour_col: Column string used for identifying the hour of encounter
+    :param model_params: dictionary of parameters that are unpacked into lightgbm model
+    :param has_weight_col: boolean for if weight column is used
+    :param path_to_results_directory: string path to results directory to save results in
+    :param save: boolean handling if the experiment should be documented
+    :param data_params_for_logging: dictionary of parameters added to documentation - used occasionally in iterative experiments to keep track of additional parameter changes
+    :param title: string title used as the folder title for the experiment when saved
+    :param phenotype: string used to identify correct saving location, e.g. 'sepsis'
+    :param values_tested: string describing values that are tested in the experiment, used for documentation
+    :param description: string description used in documentation (optional)
+    :param commentary: string commentary used in documentation (optional)
+    :return: 3 element tuple:
+        combs, a pandas dataframe documenting the run, including parameters, metrics, and documentation info such as date and data_params_for_logging
+        best_auc, a dictionary with the model, predictions, and average precision metric
+        best_prec, a dictionary with the model, predictions, and average precision metric
+
+    """
     exp_results_folder_name = str(datetime.now().strftime("%m-%d-%Y %H:%M")) + "-" + title
     exp_results_folder_path = path_to_results_directory + "/" + phenotype + "/" + exp_results_folder_name
 
@@ -147,6 +175,22 @@ def test_parameter_space_lgb(data_params,
                              title,
                              description="",
                              commentary=""):
+
+    """
+    :param data_params: dictionary of parameters that are unpacked into data_utils.get_data() to pull a dataset
+    :param test_percentage: double defining the percentage of patients to include in the test set (e.g. 15)
+    :param model_param_options: dictionary of lists, where keys are LightGBM parameters, and values are lists of options for a given LightGBM parameters
+    :param patient_col: string column used to identify a patient
+    :param hour_col: string column used to identify an encounter hour
+    :param encounter_col: string column used to identify encounter
+    :param label_col: string column used to identify labels
+    :param path_to_results_directory: string to results folder to save results
+    :param phenotype: string for phenotype used in saving e.g. 'sepsis'
+    :param title: string for folder title
+    :param description: string for experiment description, used for documentation (optional)
+    :param commentary: string for experiment commentary, used for documentation (optional)
+    :return: dataframe of experiment run results
+    """
     exp_results_folder_name = str(datetime.now().strftime("%m-%d-%Y %H:%M")) + "-" + title
     exp_results_folder_path = path_to_results_directory + "/" + phenotype + "/" + exp_results_folder_name
 
@@ -270,6 +314,22 @@ def gap_experiment_lgb(data_params,
                        title,
                        description="",
                        commentary=""):
+    """
+    :param data_params: dictionary of parameters that are unpacked into data_utils.get_data() to pull a dataset
+    :param gap_hour_options: list of integers representing the number of hours to add as a gap
+    :param test_percentage: double for percentage of patients used for test set
+    :param training_params: dictionary of model parameters that are unpacked into lightgbm model definition
+    :param patient_col: string column for patient identification
+    :param encounter_col: string column for encounter identification
+    :param hour_col: string column for encounter hour identification
+    :param label_col: string column for label identification
+    :param path_to_results_directory: string path to save directory
+    :param phenotype: string for phenotype e.g. 'sepsis'
+    :param title: string for folder title in saving
+    :param description: string for description in documentation, optional
+    :param commentary: string for commentary in documentation, optional
+    :return: dataframe of experiment run results
+    """
     exp_results_folder_name = str(datetime.now().strftime("%m-%d-%Y %H:%M")) + "-" + title
     exp_results_folder_path = path_to_results_directory + "/" + phenotype + "/" + exp_results_folder_name
 
@@ -388,6 +448,23 @@ def weighting_boundary_experiment_lgb(
         title,
         description="",
         commentary=""):
+    """
+    :param data_params: dictionary of parameters that are unpacked into data_utils.get_data() to pull a dataset
+    :param model_param_options: dictionary of model parameter options, where keys match lightgbm parameters, and values are lists of options
+    :param test_percentage: double for percentage of patients used for test set
+    :param patient_col: string column for patient identification
+    :param encounter_col: string column for encounter identification
+    :param hour_col: string column for encounter hour identification
+    :param label_col: string column for label identification
+    :param path_to_results_directory: string path to save directory
+    :param phenotype: string for phenotype e.g. 'sepsis'
+    :param weights: list of maximum weights
+    :param decline_ratios: list of decimal proportion to decline at each hour
+    :param title: string for folder title in saving
+    :param description: string for description in documentation, optional
+    :param commentary: string for commentary in documentation, optional
+    :return: dataframe of experiment run results
+    """
     exp_results_folder_name = str(datetime.now().strftime("%m-%d-%Y %H:%M")) + "-" + title
     exp_results_folder_path = path_to_results_directory + "/" + phenotype + "/" + exp_results_folder_name
     print(weights)
@@ -524,6 +601,22 @@ def weighting_experiment_lgb(
         title,
         description="",
         commentary=""):
+    """
+    :param data_params: dictionary of parameters that are unpacked into data_utils.get_data() to pull a dataset
+    :param model_param_options: dictionary of model parameter options, where keys match lightgbm parameters, and values are lists of options
+    :param test_percentage: double for percentage of patients used for test set
+    :param patient_col: string column for patient identification
+    :param encounter_col: string column for encounter identification
+    :param hour_col: string column for encounter hour identification
+    :param label_col: string column for label identification
+    :param path_to_results_directory: string path to save directory
+    :param phenotype: string for phenotype e.g. 'sepsis'
+    :param weights: list of weight options to apply to negative samples
+    :param title: string for folder title in saving
+    :param description: string for description in documentation, optional
+    :param commentary: string for commentary in documentation, optional
+    :return: dataframe of experiment run results
+    """
     exp_results_folder_name = str(datetime.now().strftime("%m-%d-%Y %H:%M")) + "-" + title
     exp_results_folder_path = path_to_results_directory + "/" + phenotype + "/" + exp_results_folder_name
     print(weights)
@@ -653,6 +746,22 @@ def backfill_experiment_lgb(data_params,
                             title,
                             description="",
                             commentary=""):
+    """
+    :param data_params: dictionary of parameters that are unpacked into data_utils.get_data() to pull a dataset
+    :param test_percentage: double for percentage of patients used for test set
+    :param backfill_options: list of integer values used as the prediction range (hours)
+    :param model_params: dictionary of model parameter options, where keys match lightgbm parameters, and values are the parameter values
+    :param patient_col: string column for patient identification
+    :param encounter_col: string column for encounter identification
+    :param hour_col: string column for encounter hour identification
+    :param label_col: string column for label identification
+    :param path_to_results_directory: string path to save directory
+    :param phenotype: string for phenotype e.g. 'sepsis'
+    :param title: string for folder title in saving
+    :param description: string for description in documentation, optional
+    :param commentary: string for commentary in documentation, optional
+    :return: dataframe of experiment run results
+    """
     exp_results_folder_name = str(datetime.now().strftime("%m-%d-%Y %H:%M")) + "-" + title
     exp_results_folder_path = path_to_results_directory + "/" + phenotype + "/" + exp_results_folder_name
 
@@ -776,6 +885,22 @@ def prevalence_experiment_lgb(
         title,
         description="",
         commentary=""):
+    """
+    :param data_params: dictionary of parameters that are unpacked into data_utils.get_data() to pull a dataset
+    :param test_percentage: double for percentage of patients used for test set
+    :param prevalence_options: list of integer values used to set dataset prevalence of positive values
+    :param model_params: dictionary of model parameter options, where keys match lightgbm parameters, and values are the parameter values
+    :param patient_col: string column for patient identification
+    :param encounter_col: string column for encounter identification
+    :param hour_col: string column for encounter hour identification
+    :param label_col: string column for label identification
+    :param path_to_results_directory: string path to save directory
+    :param phenotype: string for phenotype e.g. 'sepsis'
+    :param title: string for folder title in saving
+    :param description: string for description in documentation, optional
+    :param commentary: string for commentary in documentation, optional
+    :return: dataframe of experiment run results
+    """
     # Make Paths
     exp_results_folder_name = str(datetime.now().strftime("%m-%d-%Y %H:%M")) + "-" + title
     exp_results_folder_path = path_to_results_directory + "/" + phenotype + "/" + exp_results_folder_name

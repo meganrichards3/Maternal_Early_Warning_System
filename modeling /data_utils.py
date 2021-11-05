@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
-
 def optimize_floats(df: pd.DataFrame) -> pd.DataFrame:
     floats = df.select_dtypes(include=['float64']).columns.tolist()
     df[floats] = df[floats].apply(pd.to_numeric, downcast='float')
@@ -29,8 +28,12 @@ def optimize_objects(df: pd.DataFrame, datetime_features: List[str]) -> pd.DataF
             df[col] = pd.to_datetime(df[col])
     return df
 
-
 def optimize_dtypes(df: pd.DataFrame, datetime_features: List[str] = []):
+    """
+    :param df: pandas dataframe
+    :param datetime_features: list of strings defining columns in df that are date-time type
+    :return: df with downcast operations applied
+    """
     return optimize_floats(optimize_ints(optimize_objects(df, datetime_features)))
 
 
@@ -42,6 +45,13 @@ def find_label_max(dataset, label_column_title):
 
 
 def sample_for_class_balance(data, label_column, prevalence, encounter_col):
+    """
+    :param data: pandas dataframe
+    :param label_column: string identifying label column
+    :param prevalence: double representing the proportion of positives to select for (e.g. 0.2 for 20% positive)
+    :param encounter_col: string identifying encounter column
+    :return: data that has undersampled the minority class to ensure prevalence proportion is met
+    """
     label_max = data.groupby(encounter_col).apply(find_label_max, label_column)
     pos_ids = list(label_max[label_max == 1].index)
     neg_ids = list(label_max[label_max == 0].index)
@@ -68,6 +78,14 @@ def encode_categorical_variables(df, categorical_cols):
 
 
 def make_gap_before_condition_met(df, gap, encounter_col_name, hour_col_name, label_col_name):
+    """
+    :param df: pandas dataframe
+    :param gap: integer representing the number of sample hours to be removed prior to positive label
+    :param encounter_col_name: string identifying patient encounter
+    :param hour_col_name: string identifying encounter hour
+    :param label_col_name: string identifying dataframe label
+    :return: pandas dataframe with gap hours of data removed prior to each positive label in the encounter
+    """
     instance_hour_df = pd.DataFrame(df[df[label_col_name] == 1].groupby(encounter_col_name)[hour_col_name].min())
     instance_hour_df = instance_hour_df.rename(columns={hour_col_name: 'instance_hour'})
     data2 = pd.merge(instance_hour_df, df, how='right', on=encounter_col_name)
@@ -87,6 +105,14 @@ def make_gap_before_condition_met(df, gap, encounter_col_name, hour_col_name, la
 
 
 def apply_backfill(df, hours, encounter_col_name, hour_col_name, label_col_name):
+    """
+    :param df: pandas dataframe
+    :param hours: int hours used as the prediction range
+    :param encounter_col_name: string encounter column
+    :param hour_col_name: string hour column
+    :param label_col_name: string label column
+    :return: pandas df with positive labels extended backwards by hours param value
+    """
     instance_hour_df = pd.DataFrame(df[df[label_col_name] == 1].groupby(encounter_col_name)[hour_col_name].min())
     instance_hour_df = instance_hour_df.rename(columns={hour_col_name: 'instance_hour'})
     data2 = pd.merge(instance_hour_df, df, how='right', on=encounter_col_name)
@@ -105,6 +131,10 @@ def apply_backfill(df, hours, encounter_col_name, hour_col_name, label_col_name)
 
 
 def read_in_chunks(path):
+    """
+    :param path: string path to dataset location
+    :return: pandas dataframe of file at location path
+    """
     chunksize = 10 ** 6
     chunks = []
     if '.csv' in path:
@@ -131,6 +161,24 @@ def get_data(data_path,
              weight_max,
              weight_increment
              ):
+    """
+    :param data_path: string path to dataset
+    :param subset_columns_to_drop_duplicates: list of strings to drop any duplicate of in groupby (e.g. encounter column and hour column)
+    :param label_col: string, label column
+    :param encounter_col: string, encounter column
+    :param hour_col: string, hour column
+    :param hours_to_backfill: int, hours to use as prediction range
+    :param sample_for_prevalence: boolean of whether to apply prevalence constraint on dataframe
+    :param prevalence: double setting the prevalence if sample_for_prevalence is True
+    :param encode_categorical: boolean of whether to apply prevalence constraint on dataframe
+    :param categorical_cols: list of strings for categorical columns to encode
+    :param make_hour_gap: boolean of whether to apply hour gap operation on dataframe
+    :param hour_gap: int, defining number of hours removed before positive hour if make_hour_gap is True
+    :param make_weight_col: boolean of whether to create a weight column for dataframe
+    :param weight_max: double, maximum weight, given to negative encounters and positive hours of positive encounters.
+    :param weight_increment: double, defines weight decrease for each negative hour prior to a positive hour if make_weight_column is True
+    :return: dataframe of dataset with applied operations, if make_weight_column is True
+    """
     data = read_in_chunks(data_path)
     data = optimize_dtypes(data, [])
     if 'Unnamed: 0' in data.columns.values:
@@ -163,6 +211,12 @@ def get_data(data_path,
 
 
 def make_train_test_splits_by_patients(dataset, patient_col, test_percentage=15):
+    """
+    :param dataset: pandas dataframe
+    :param patient_col: string, patient column
+    :param test_percentage: int, defines the proportion of patients in test set (e.g. 15)
+    :return: tuple of pandas dataframes in the order of: training dataset, testing dataset
+    """
     patients = list(dataset[patient_col].astype('str').unique())
     random.seed(10)
     test_patients = random.sample(patients, int((test_percentage / 100) * len(patients)))
@@ -174,7 +228,14 @@ def make_train_test_splits_by_patients(dataset, patient_col, test_percentage=15)
     return train_set, test_set
 
 
-def make_splits_by_patients(dataset, label_col, patient_col, test_percentage=15):
+def make_splits_by_patients_and_labels(dataset, label_col, patient_col, test_percentage=15):
+    """
+    :param dataset: pandas dataframe
+    :param label_col: string, label column
+    :param patient_col: string, patient column
+    :param test_percentage: int, defines the proportion of patients in test set (e.g. 15)
+    :return: tuple of pandas dataframes in the order of: training data, training labels, testing data, testing labels
+    """
     patients = list(dataset[patient_col].astype('str').unique())
     random.seed(10)
     test_patients = random.sample(patients, int((test_percentage / 100) * len(patients)))
@@ -197,6 +258,15 @@ def make_splits_by_patients(dataset, label_col, patient_col, test_percentage=15)
 
 
 def make_weight_column_distribution(dataset, label_col, encounter_col, hour_col, max_weight, increment):
+    """
+    :param dataset: pandas dataframe
+    :param label_col: string label column
+    :param encounter_col: string, encounter column
+    :param hour_col: string, hour column
+    :param max_weight: double, maximum weight value, applied to all hours of a negative encounter, and positive hours of a positive encounter
+    :param increment: double, defines weight decline increment per hour prior to positive hour
+    :return: pandas dataframe with negative hours prior to a positive under-weighted according to a linear distribution
+    """
     # Make Hours before instance
     instance_hour_df = pd.DataFrame(dataset[dataset[label_col] == 1].groupby(encounter_col)[hour_col].min())
     instance_hour_df = instance_hour_df.rename(columns={hour_col: 'instance_hour'})
@@ -220,7 +290,13 @@ def make_weight_column_distribution(dataset, label_col, encounter_col, hour_col,
     return data
 
 
-def make_weight_column(dataset, label_col, encounter_col, hour_col, pos_weight):
+def make_weight_column(dataset, label_col, pos_weight):
+    """
+    :param dataset: pandas dataframe
+    :param label_col: string, label column
+    :param pos_weight: double, weight applied to positive samples
+    :return: pandas dataframe with 'weight' column where positive samples are weighted pos_weight, and negative samples are weighted 1.0
+    """
     dataset['weight'] = pos_weight * dataset[label_col]
     dataset['weight'] = dataset['weight'].clip(1.0)
     return dataset
