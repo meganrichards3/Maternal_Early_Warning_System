@@ -11,23 +11,27 @@ DIHI created a trans-disciplinary team of obstetric physicians, and technical st
 
 ## **About my Role**
 
-I have authored all code in this repository, and have been responsible for all dataset building and modeling for the project, supervised by Mark Sendak and Michael Gao (DIHI). Phenotype definitions were created by the following clinical members of the MEWS team: 
-Ashraf Habib, MBBCh, MSc, FRCA, Terrence Allen, MBBS,
-Sarah McWay Boling, RN
-Melissa Bauer, DO,
-Jennifer Gilner, MD, PhD,
-Suresh Balu, MBA, MS,
-Brenna Hughes, MD, MSc, 
-Courtney Mitchell, MD, PHD, and the project has been managed by Will Knechtle. 
+I have authored all code in this repository, and have been responsible for all dataset building and modeling for the project, supervised by Mark Sendak and Michael Gao (DIHI). 
 
 ## **Included in this Repository**
 
-This respository includes code used to build:
+### Dataset Pipeline 
+The datasets used for these predictions are hour-by-hour input data including measures of patient flowsheets, lab orders/collections/results, demographics, prenatal visits, and comorbidities. 
 
-1. Time-specific indicators for the 8 phenotypes 
-2. Time-series datasets processed from the following portions of the EHR: patient flowsheets, problem list data, snomed codes, prenatal visit information, and demographic information. 
-3. Modeling experiments for gradient-boosted trees and recurrant neural networks
-4. Automated documentation and evaluation code, including analysis of population subgroup performance
+
+### Modeling Experiments 
+A significant challenge for this task is data imbalance, driven primarily by two factors: 1) SMMs occur for very few patients 2) Because we are making hourly predictions of SMM occurance in the following N hours, even these patients only have positive values for the N hours of an encounter prior to a SMM condition being met, and negative for all encounter hours prior. 
+
+To help mitigate these effects, I designed the following experiments: 
+
+1. Undersampling the minority class 
+2. Weighting minority samples 
+3. Weighting minority samples with a distribution 
+
+### Automated Documentation and Evaluation 
+Automated documentation and evaluation code, including analysis of population subgroup performance
+
+### Example Runs 
 
 ## Repository Guide 
 
