@@ -11,7 +11,7 @@ DIHI created a trans-disciplinary team of obstetric physicians, and technical st
 
 ## **About my Role**
 
-I have authored all code in this repository, and have been responsible for all dataset building and modeling for the project, supervised by Mark Sendak and Michael Gao (DIHI). 
+I have authored all code in this repository, and have been responsible for all dataset building and modeling for the project, supervised by Mark Sendak and Michael Gao (DIHI). Note: This repository is in progress, and is not complete.  
 
 ## **Included in this Repository**
 
